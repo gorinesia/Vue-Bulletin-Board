@@ -3,7 +3,11 @@
     <Header />
     <div class="app-container">
       <SideMenu />
-      <Main />
+      <main class="main-container">
+        <keep-alive>
+          <router-view></router-view>
+        </keep-alive>
+      </main>
     </div>
   </div>
 </template>
@@ -12,13 +16,11 @@
 import 'normalize.css';
 import Header from './components/Header';
 import SideMenu from './components/SideMenu';
-import Main from './components/Main';
 
 export default {
   components: {
     Header,
     SideMenu,
-    Main
   }
 }
 </script>
@@ -27,5 +29,12 @@ export default {
 .app-container {
   display: flex;
   padding-top: 60px;
+}
+
+.main-container {
+  width: calc(100% - 200px);
+  flex: 1;
+  position: absolute;
+  left: 200px;
 }
 </style>
