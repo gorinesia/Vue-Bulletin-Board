@@ -54,8 +54,6 @@ export default {
 </script>
 
 <style scoped>
-
-
 .devider {
   border-top: 10px solid #ccc;
 }

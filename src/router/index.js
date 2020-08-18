@@ -13,12 +13,12 @@ Vue.use(VueRouter)
       component: General
     },
     {
-      path: '/Chat',
+      path: '/chat',
       name: 'Chat',
       component: Chat
     },
     {
-      path: '/SelfIntroduction',
+      path: '/self-introduction',
       name: 'SelfIntroduction',
       component: SelfIntroduction
     },
