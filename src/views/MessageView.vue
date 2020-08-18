@@ -1,6 +1,6 @@
 <template>
   <div>
-    <TextBox :onPost="addMessages" />
+    <TextBox :onPost="addMessages" :channelId="$route.params.channelId" />
     <div class="devider"></div>
     <Spinner v-if="!initialLoaded" />
     <p class="no-messages" v-else-if="initialLoaded && messages.length === 0">投稿データ0件</p>
@@ -9,10 +9,11 @@
 </template>
 
 <script>
-import TextBox from './TextBox';
-import MessageList from './MessageList';
-import MessageModel from '../models/Message';
-import Spinner from './Spinner';
+import TextBox from '@/components/TextBox';
+import MessageList from '@/components/MessageList';
+import Spinner from '@/components/Spinner';
+
+import MessageModel from '@/models/Message';
 
 export default {
   components: {
@@ -32,9 +33,7 @@ export default {
     }
   },
   async created() {
-    const messages = await this.fetchMessages();
-    this.messages = messages;
-    this.initialLoaded = true;
+    await this.fetchMessages();
   },
   methods: {
     addMessages(message) {
@@ -43,17 +42,25 @@ export default {
     async fetchMessages() {
       let messages = [];
       try {
-        messages = await MessageModel.fetchMessages();
+        messages = await MessageModel.fetchMessages(this.$route.params.channelId);
       } catch (error) {
         alert(error.message);
       }
-      return messages;
+      this.messages = messages;
+      this.initialLoaded = true;
+    }
+  },
+  watch: {
+    '$route': async function() {
+      this.initialLoaded = false;
+      this.messages = [];
+      await this.fetchMessages();
     }
   }
 }
 </script>
 
-<style scoped>
+<style scoped>   
 .devider {
   border-top: 10px solid #ccc;
 }
