@@ -1,19 +1,19 @@
 <template>
   <div>
-    <TextBox :onPost="addMessages" :channelId="$route.params.channelId" />
+    <TextBox />
     <div class="devider"></div>
-    <Spinner v-if="!initialLoaded" />
-    <p class="no-messages" v-else-if="initialLoaded && messages.length === 0">投稿データ0件</p>
-    <MessageList v-else :messages="reversedMessages" />
+    <Spinner v-if="isLoading" />
+    <p class="no-messages" v-else-if="messages($route.params.channelId).length === 0">投稿データ0件</p>
+    <MessageList v-else :messages="messages($route.params.channelId)" />
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 import TextBox from '@/components/TextBox';
 import MessageList from '@/components/MessageList';
 import Spinner from '@/components/Spinner';
-
-import MessageModel from '@/models/Message';
 
 export default {
   components: {
@@ -21,15 +21,12 @@ export default {
     MessageList,
     Spinner
   },
-  data() {
-    return {
-      messages: [],
-      initialLoaded: false
-    }
-  },
   computed: {
-    reversedMessages() {
-      return this.messages.slice().reverse();
+    ...mapGetters({
+      messages: 'channels/getChannelMessages'
+    }),
+    isLoading() {
+      return this.$store.state.channels.loading.messages;
     }
   },
   async created() {
@@ -40,20 +37,19 @@ export default {
       this.messages.push(message);
     },
     async fetchMessages() {
-      let messages = [];
+      const payload = {
+        channelId: this.$route.params.channelId
+      }
+
       try {
-        messages = await MessageModel.fetchMessages(this.$route.params.channelId);
+        this.$store.dispatch('channels/fetchChannelMessages', payload)
       } catch (error) {
         alert(error.message);
       }
-      this.messages = messages;
-      this.initialLoaded = true;
     }
   },
   watch: {
     '$route': async function() {
-      this.initialLoaded = false;
-      this.messages = [];
       await this.fetchMessages();
     }
   }
